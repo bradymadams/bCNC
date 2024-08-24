@@ -1550,7 +1550,7 @@ class CNC:
     # ----------------------------------------------------------------------
     # Create path for one g command
     # ----------------------------------------------------------------------
-    def motionPath(self):
+    def motionPath(self, ignoreZeroMovement=True):
         xyz = []
 
         # Execute g-code
@@ -1559,6 +1559,7 @@ class CNC:
                 self.xval - self.x != 0.0
                 or self.yval - self.y != 0.0
                 or self.zval - self.z != 0.0
+                or not ignoreZeroMovement
             ):
                 xyz.append((self.x, self.y, self.z))
                 xyz.append((self.xval, self.yval, self.zval))
@@ -3511,7 +3512,7 @@ class GCode:
             self.cnc.motionStart(cmds)
             if (autolevel and self.cnc.gcode in (0, 1, 2, 3)
                     and self.cnc.mval == 0):
-                xyz = self.cnc.motionPath()
+                xyz = self.cnc.motionPath(ignoreZeroMovement=False)
                 if not xyz:
                     # while auto-levelling, do not ignore non-movement
                     # commands, just append the line as-is
@@ -5165,7 +5166,7 @@ class GCode:
 
                 if (autolevel and self.cnc.gcode in (0, 1, 2, 3)
                         and self.cnc.mval == 0):
-                    xyz = self.cnc.motionPath()
+                    xyz = self.cnc.motionPath(ignoreZeroMovement=False)
                     if not xyz:
                         # while auto-levelling, do not ignore non-movement
                         # commands, just append the line as-is
